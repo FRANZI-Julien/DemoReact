@@ -280,11 +280,16 @@ box-shadow:  5px 5px 0px #2c445a,
   
 }
 
-#pay{
-  width: auto;
+#app{
+  background-color: #fccc00;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  padding-top: 3%;
 }
 
-#trash{
-  width: auto;
-  margin-top: 10px;
-}
+li {
+  display: flex;
+  justify-content: space-around;
+
+ }

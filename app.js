@@ -18,6 +18,17 @@ const Product= (props) => (
         </div>
     </div>
 )
+const Order = (props) =>
+    <div id={props.details.id} class="menu-list"style={{
+      display:"none"    
+    }}>  
+        <h2>{props.details.name}</h2>
+        <p>{props.details.price}</p>
+        <button className="btn btn-primary" onClick={props.decrement}>-</button>
+        <span>{props.details.quantity}</span>
+        <button className="btn btn-primary" onClick={props.increment}>+</button>
+    </div>
+
 
 //composant dans une classe
 class App extends React.Component{
@@ -35,41 +46,60 @@ class App extends React.Component{
             {id: 10, name:"Burger Chicken", price: 7.95, Image:"image/SeekPng.com_burger-png_790996.png"},
             {id: 11, name:"Bucket Chick", price: 20.95, Image:"image/Mon projet (1).png"},
             {id: 12, name:"Nuggets Spicy", price: 9.95, Image:"image/Mon projet3.png"},
-        ]
+        ],
         //content:"Mon composant Class"
+        ordered: [],
     }
-    handleClick=(e)=> {
-        const clickedElementId = e.target.parentNode.id // renvoie la div entière
-        const clicked = this.state.products.find(element = element.id == clickedElementId)
+    handleClick = (e) => {
+        const clickedElementId = e.target.parentNode.id; // renvoie l'ID de la div parente
+        const clicked = this.state.products.find(
+          (element) => element.id == clickedElementId
+        );
         const copiedOrdered = [...this.state.ordered];
-        copiedOrdered.push(clicked)
-        this.setState({ordered: copiedOrdered})
-    }
+        const existingOrder = copiedOrdered.find((order) => order.id == clicked.id);
+        if (existingOrder) {
+          existingOrder.quantity += 1;
+        } else {
+          clicked.quantity = 1;
+          copiedOrdered.push(clicked);
+        }
+        this.setState({ ordered: copiedOrdered });
+      };
     
+      increment = (e) => {
+        const clickedElementId = e.target.parentNode.id //renvoie la div entière 
+        const copiedOrdered = [...this.state.ordered]
+        const clicked = copiedOrdered.find(element => element.id == clickedElementId)
+        clicked.quantity += 1
+        this.setState({ordered: copiedOrdered})
+      } 
+
+      decrement = (e) => {
+        const clickedElementId = e.target.parentNode.id //renvoie la div entière 
+        const copiedOrdered = [...this.state.ordered]
+        const clicked = copiedOrdered.find(element => element.id == clickedElementId)
+          if(clicked.quantity > 1){
+            clicked.quantity -= 1
+            this.setState({ordered: copiedOrdered})
+          }else {
+            const clickedIndex = copiedOrdered.indexOf(clicked)
+            copiedOrdered.splice(clickedIndex, 1)
+            this.setState({ordered: copiedOrdered})
+          }  
+      }
+
+
     render(){
         const productsList = this.state.products.map(product => 
             <Product key={product.id} details={product} handleClick={this.handleClick}/>
         )
-        //const orderedList = this.state.ordered.map(order =>)
-
+        const orderedList = this.state.ordered.map(order =>
+          <Order key={order.id} details={order} increment={this.increment} decrement={this.decrement}/> 
+        ) 
         return (
     <React.Fragment>
-    <ul id="menu-list" style={{
-    display:"none"    
-    }}>
-        <h1>Panier</h1>  
-        <li>Entrée</li>
-        <span className="Total">TOTAL :</span>
-        <button className="cta"id="pay">
-            <span class="span"><i className="fa-solid fa-credit-card"></i></span>
-        <div></div>   
-        </button>
-        <button className="cta"id="trash">
-            <span class="span"><i className="fa-solid fa-trash"></i></span>
-        </button>
-    </ul>
-        <div className="list">{productsList}
-        </div>
+      {productsList}
+      {orderedList}
         
     </React.Fragment>
     )
